@@ -64,10 +64,14 @@ ent_model, offer_model, mmr_model, pref_model, feature_columns = load_models()
 def login():
     try:
         request_data = request.json
-        numero = str(request_data.get("numero"))  
+        numero = str(request_data.get("numero"))  # Get the phone number from the request
 
         if numero in phone_numbers:
-            return jsonify({"success": True, "message": "Login successful!"}), 200
+            # Retrieve the user's name from the Excel file
+            user_row = data[data['Numéro'] == numero]
+            user_name = user_row['Nom'].values[0]  # Assuming the 'Nom' column exists
+
+            return jsonify({"success": True, "message": "Login successful!", "name": user_name}), 200
         else:
             return jsonify({"success": False, "message": "Invalid phone number"}), 401
     except Exception as e:
@@ -105,6 +109,8 @@ def predict():
         })
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+    
+
 
 if __name__ == '__main__':
     app.run(debug=True)
